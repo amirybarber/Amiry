@@ -1,30 +1,37 @@
 *{box-sizing:border-box}
-:root{--bg:#050505;--panel:#101010;--line:#292929;--muted:#999;--white:#fff}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--white);font-family:Arial,"Noto Sans",sans-serif}
-button,input,select{font:inherit}
-.header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 5%;background:rgba(5,5,5,.94);backdrop-filter:blur(12px);border-bottom:1px solid #222}
-.brand{color:#fff;text-decoration:none;font-size:30px;font-weight:800;letter-spacing:5px}
-.nav{display:flex;gap:8px}.nav button{color:#fff;background:#121212;border:1px solid #333;padding:9px 15px;cursor:pointer}
-.hero{text-align:center;max-width:1050px;margin:auto;padding:90px 20px 100px}
-.eyebrow{color:#999;letter-spacing:4px;font-size:13px}
-.hero h1{font-size:clamp(42px,7vw,76px);line-height:1.25;margin:32px 0 18px}
-.hero h1 span{font-weight:400}.hero p{max-width:700px;margin:0 auto;color:#aaa;font-size:clamp(17px,2.5vw,22px);line-height:2}
-.hero-btn,.phone{display:inline-block;margin:30px 0 55px;padding:16px 30px;background:#fff;color:#000;text-decoration:none;border-radius:4px;font-weight:700}
-.hero-circle{width:min(400px,78vw);aspect-ratio:1;margin:auto;border:1px solid #555;border-radius:50%;overflow:hidden}
-.hero-circle img{width:100%;height:100%;object-fit:cover}
-.catalog{padding:80px 5%;border-top:1px solid #222}
-.section-head{max-width:1250px;margin:0 auto 35px;display:flex;align-items:end;justify-content:space-between;gap:25px}
-h2{font-size:clamp(32px,5vw,50px);margin:12px 0}
-.tools{display:flex;gap:10px}.tools input,.tools select{background:#111;color:#fff;border:1px solid #333;padding:13px 14px;border-radius:5px;min-width:160px}
-.cards{max-width:1250px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:.2s}
-.card:hover{transform:translateY(-3px);border-color:#666}
-.image-wrap{position:relative}.card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
-.badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.75);padding:6px 10px;border-radius:20px;font-size:12px}
-.card-body{padding:15px}.card h3{margin:0 0 7px;font-size:21px}.card p{color:#888;margin:0 0 12px;font-size:14px}.price{font-size:19px;font-weight:800;margin-bottom:13px}.select-btn{width:100%;padding:12px;background:#fff;color:#000;border:0;border-radius:4px;cursor:pointer;font-weight:700}
-.booking{padding:80px 5%;border-top:1px solid #222;display:flex;justify-content:center;align-items:center;gap:50px;flex-wrap:wrap;text-align:center}.booking p{color:#aaa}.booking .phone{margin:0}
-footer{text-align:center;padding:30px;color:#666;border-top:1px solid #222}
-@media(max-width:950px){.cards{grid-template-columns:repeat(3,1fr)}.section-head{align-items:stretch;flex-direction:column}.tools{width:100%}.tools input{flex:1}}
-@media(max-width:650px){.header{flex-direction:column}.brand{font-size:25px}.hero{padding-top:60px}.cards{grid-template-columns:repeat(2,1fr);gap:12px}.card h3{font-size:17px}.card p{font-size:12px}.tools{flex-direction:column}.tools input,.tools select{width:100%}.catalog{padding-left:12px;padding-right:12px}.booking{gap:15px}}
-@media(max-width:420px){.cards{grid-template-columns:1fr}.hero h1{font-size:42px}}
+:root{--black:#0b0b0c;--white:#fff;--bg:#f4f5f7;--card:#fff;--muted:#717780;--line:#e1e4e8}
+body{margin:0;background:var(--bg);color:#15171a;font-family:Tahoma,Arial,sans-serif}
+button,input,textarea,select{font:inherit}
+.hero{background:#0b0b0c;color:#fff;padding:18px 5% 70px}
+.topbar{max-width:1250px;margin:auto;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:32px;font-weight:900;letter-spacing:4px}
+.admin-btn{background:#fff;color:#111;border:0;border-radius:12px;padding:11px 16px;cursor:pointer;font-weight:700}
+.hero-content{max-width:1250px;margin:70px auto 0}
+.eyebrow{color:#aeb3ba;letter-spacing:3px;font-size:13px}
+.hero h1{font-size:clamp(42px,8vw,82px);margin:12px 0}
+.hero-content p:last-child{color:#c9cdd2;font-size:18px}
+main{max-width:1250px;margin:-28px auto 60px;padding:0 15px}
+.toolbar{background:#fff;border-radius:18px;padding:14px;display:grid;grid-template-columns:2fr 1fr;gap:10px;box-shadow:0 8px 28px #0001;margin-bottom:22px}
+.toolbar input,.toolbar select{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;outline:none;background:#fff}
+.products{display:grid;grid-template-columns:repeat(4,1fr);gap:17px}
+.product{background:var(--card);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 4px 16px #0000000c}
+.product-img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#e9ebee}
+.product-body{padding:14px}
+.category{color:var(--muted);font-size:12px}
+.product h3{margin:7px 0;font-size:18px}
+.price{font-size:17px;font-weight:800;margin:8px 0}
+.desc{color:var(--muted);font-size:13px;line-height:1.7;min-height:43px}
+.edit-btn{width:100%;background:#111;color:#fff;border:0;border-radius:10px;padding:11px;cursor:pointer;margin-top:10px}
+.modal{position:fixed;inset:0;background:#0009;display:flex;justify-content:center;align-items:center;padding:16px;z-index:50}
+.hidden{display:none}
+.modal-card{width:min(560px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:20px;padding:22px;position:relative}
+.close{position:absolute;left:12px;top:7px;border:0;background:transparent;font-size:32px;cursor:pointer}
+.modal-card h2{margin-top:0}
+.modal-card label{display:block;margin:13px 0;font-weight:700}
+.modal-card input,.modal-card textarea{width:100%;margin-top:6px;padding:11px;border:1px solid var(--line);border-radius:10px}
+.preview{width:100%;max-height:270px;object-fit:contain;background:#f0f1f3;border-radius:12px;margin-top:8px;display:none}
+.primary{background:#111;color:#fff;border:0;border-radius:11px;padding:12px;cursor:pointer}
+.full{width:100%;margin-top:10px}
+@media(max-width:950px){.products{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:650px){.products{grid-template-columns:repeat(2,1fr);gap:10px}.toolbar{grid-template-columns:1fr}.hero{padding-bottom:55px}.brand{font-size:25px}.admin-btn{font-size:12px;padding:9px}.product-body{padding:10px}.product h3{font-size:15px}.price{font-size:14px}.desc{font-size:12px}}
+@media(max-width:390px){.products{grid-template-columns:1fr}}
