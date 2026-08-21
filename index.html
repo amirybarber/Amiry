@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070708"><title>AMIRY — Master Barber</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<header class="site-header">
+  <a class="brand" href="#home">AMIRY<span>®</span></a>
+  <nav><a href="#home">خانه</a><a href="#styles">استایل‌ها</a><a href="#services">خدمات</a><a href="#about">درباره</a><a href="#contact">تماس</a></nav>
+  <div class="header-actions"><button id="langBtn" class="icon-btn">EN</button><button id="bookTop" class="outline-btn">نوبت بگیر</button><button id="adminTop" class="icon-btn hidden">⚙️</button><button id="menuBtn" class="menu-btn">☰</button></div>
+</header>
+
+<main id="home">
+<section class="hero" id="hero"><div class="hero-overlay"></div><div class="hero-content">
+<p class="eyebrow">OMID AMIRY · MASTER BARBER</p><h1 id="heroTitle">استایل خودت را انتخاب کن.</h1>
+<p id="heroSub" class="hero-sub">مدل مو، ریش و استایل دلخواهت را ببین و برای نوبت انتخاب کن.</p>
+<div class="hero-actions"><a class="primary-btn" href="#styles">مشاهده استایل‌ها</a><button class="ghost-btn" id="heroBook">نوبت بگیر</button></div>
+<div class="hero-stats"><div><strong id="styleCount">100</strong><span>استایل</span></div><div><strong>24/7</strong><span>درخواست نوبت</span></div><div><strong>AMIRY</strong><span>کیفیت حرفه‌ای</span></div></div>
+</div></section>
+
+<section class="section controls-section" id="styles">
+<div class="section-heading"><div><p class="eyebrow">AMIRY COLLECTION</p><h2>استایل مورد علاقه‌ات را پیدا کن</h2></div><button class="primary-btn" id="stylesBook">نوبت بگیر</button></div>
+<div class="filters"><input id="search" type="search" placeholder="جستجوی استایل یا شماره..."><select id="category"><option value="all">همه استایل‌ها</option><option value="classic">کلاسیک</option><option value="fade">فید</option><option value="beard">مو و ریش</option><option value="modern">مدرن</option></select><select id="sort"><option value="default">پیش‌فرض</option><option value="low">ارزان‌ترین</option><option value="high">گران‌ترین</option></select></div>
+<div id="stylesGrid" class="styles-grid"></div><div id="emptyState" class="empty hidden">استایلی پیدا نشد.</div>
+</section>
+
+<section class="section services" id="services"><p class="eyebrow">SERVICES</p><h2>خدمات حرفه‌ای</h2><div class="service-grid">
+<article>✂️<h3>کوتاهی حرفه‌ای</h3><p>بر اساس فرم صورت و سلیقه شما.</p></article><article>🪒<h3>اصلاح و فید</h3><p>خط‌گیری دقیق و فید تمیز.</p></article><article>🧔<h3>طراحی ریش</h3><p>فرم‌دهی و استایل حرفه‌ای ریش.</p></article><article>✨<h3>استایل ویژه</h3><p>ترکیب مدل مو و ریش برای ظاهر کامل.</p></article>
+</div></section>
+
+<section class="section about" id="about"><div class="about-card"><div><p class="eyebrow">OMID AMIRY</p><h2>سبک شخصی، اجرای حرفه‌ای.</h2><p>AMIRY برای نمایش استایل‌های واقعی، قیمت‌ها و رزرو سریع طراحی شده است.</p></div><div class="about-mark">A<br><span>MIRY</span></div></div></section>
+<section class="section contact" id="contact"><p class="eyebrow">CONTACT</p><h2>برای نوبت یا سوال با ما در تماس باش.</h2><div class="contact-actions"><a class="primary-btn" href="tel:+93773269043">📞 +93 773 269 043</a><a class="outline-btn" href="sms:+93773269043">💬 SMS</a></div></section>
+</main>
+<footer>© <span id="year"></span> AMIRY <span>OMID AMIRY · MASTER BARBER</span></footer>
+
+<dialog id="styleDialog" class="dialog"><button class="dialog-close" data-close="styleDialog">×</button><div id="styleDialogBody"></div></dialog>
+<dialog id="bookingDialog" class="dialog"><button class="dialog-close" data-close="bookingDialog">×</button><p class="eyebrow">BOOKING</p><h2>درخواست نوبت</h2><p class="muted">اطلاعات خود را وارد کن؛ درخواست برای مدیریت ثبت می‌شود.</p>
+<form id="bookingForm" class="form-grid"><label>اسم<input name="firstName" required></label><label>تخلص<input name="lastName" required></label><label>تاریخ<input name="date" type="date" required></label><label>ساعت<input name="time" type="time" required></label><label class="full">استایل<select name="style" id="bookingStyle"></select></label><label class="full">یادداشت<textarea name="note" rows="3"></textarea></label><div id="bookingSummary" class="full booking-summary"></div><button class="primary-btn full">ارسال درخواست نوبت</button></form></dialog>
+
+<dialog id="loginDialog" class="dialog small"><button class="dialog-close" data-close="loginDialog">×</button><p class="eyebrow">OWNER ACCESS</p><h2>ورود مالک</h2><p class="muted">این بخش فقط برای مدیریت سایت است.</p><form id="loginForm" class="form-grid"><label class="full">رمز مدیریت<input name="pin" type="password" required></label><button class="primary-btn full">ورود</button></form></dialog>
+
+<dialog id="adminDialog" class="dialog admin-dialog"><button class="dialog-close" data-close="adminDialog">×</button>
+<div class="admin-header"><div><p class="eyebrow">AMIRY CONTROL CENTER</p><h2>پنل مدیریت</h2></div><button class="outline-btn" id="logout">خروج</button></div>
+<div class="admin-tabs"><button class="tab active" data-tab="dashboard">داشبورد</button><button class="tab" data-tab="stylesAdmin">استایل‌ها</button><button class="tab" data-tab="appearance">ظاهر سایت</button><button class="tab" data-tab="bookings">نوبت‌ها</button><button class="tab" data-tab="settings">تنظیمات</button></div>
+<section id="tab-dashboard" class="admin-panel active"><div class="metric-grid"><div><b id="mStyles">100</b><span>استایل</span></div><div><b id="mBookings">0</b><span>درخواست نوبت</span></div><div><b id="mLikes">0</b><span>لایک</span></div><div><b id="mComments">0</b><span>کامنت</span></div></div><div class="admin-note">این پنل فقط برای مالک است. مدیریت عکس، قیمت، نام، توضیحات، پس‌زمینه و نوبت‌ها از اینجا انجام می‌شود.</div></section>
+<section id="tab-stylesAdmin" class="admin-panel"><div class="admin-toolbar"><button id="addStyle" class="primary-btn">＋ افزودن استایل</button><input id="adminSearch" placeholder="جستجو..."></div><div id="adminStylesList" class="admin-list"></div></section>
+<section id="tab-appearance" class="admin-panel"><div class="appearance-grid"><form id="appearanceForm" class="form-grid"><label>عنوان اصلی<input name="heroTitle"></label><label>متن معرفی<input name="heroSub"></label><label>نام برند<input name="brand"></label><label>رنگ تأکیدی<input name="accent" type="color"></label><label class="full">عکس پس‌زمینه Hero<input name="heroImage" type="file" accept="image/*"></label><label class="full">لوگو<input name="logoImage" type="file" accept="image/*"></label><button class="primary-btn full">ذخیره ظاهر</button></form><div class="preview-card"><div id="bgPreview"></div><p>پیش‌نمایش پس‌زمینه</p></div></div></section>
+<section id="tab-bookings" class="admin-panel"><div class="admin-toolbar"><button id="clearBookings" class="outline-btn">پاک‌کردن درخواست‌ها</button><button id="notifyAll" class="primary-btn">ساخت پیام‌های SMS</button></div><div id="bookingsList"></div></section>
+<section id="tab-settings" class="admin-panel"><div class="settings-card"><h3>شماره‌های اعلان</h3><code>0748603450</code><code>+93773269043</code><p class="muted">ارسال خودکار SMS به یک سرویس SMS و بک‌اند امن نیاز دارد. در نسخه GitHub Pages دکمه SMS پیام آماده را باز می‌کند.</p></div><div class="settings-card"><h3>امنیت</h3><p>رمز داخل جاوااسکریپت امنیت واقعی ایجاد نمی‌کند. برای نسخه عملیاتی باید احراز هویت سمت سرور و دیتابیس اضافه شود.</p></div></section>
+</dialog>
+
+<dialog id="editDialog" class="dialog"><button class="dialog-close" data-close="editDialog">×</button><p class="eyebrow">STYLE MANAGEMENT</p><h2>ویرایش استایل</h2>
+<form id="editForm" class="form-grid"><input type="hidden" name="id"><label>نام استایل<input name="name" required></label><label>قیمت (AFN)<input name="price" type="number" min="0" required></label><label>دسته‌بندی<select name="category"><option value="classic">کلاسیک</option><option value="fade">فید</option><option value="beard">مو و ریش</option><option value="modern">مدرن</option></select></label><label>وضعیت<select name="active"><option value="true">فعال</option><option value="false">غیرفعال</option></select></label><label class="full">توضیحات<textarea name="description" rows="3"></textarea></label><label class="full">عکس استایل<input name="image" type="file" accept="image/*"></label><div class="form-actions full"><button type="button" class="danger-btn" id="deleteStyle">🗑️ حذف استایل</button><span></span><button class="primary-btn">ذخیره</button></div></form></dialog>
+
+<script src="script.js"></script>
+</body></html>
