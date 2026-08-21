@@ -1,86 +1,83 @@
-const KEY='AMIRY_DB_V3';
-const ADMIN_PIN='CHANGE_ME_BEFORE_DEPLOY';
-const ADMIN_SESSION='AMIRY_OWNER_SESSION';
-const PHONE1='0748603450', PHONE2='+93773269043';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const KEY='amiry_v3';
+const defaultStyles=Array.from({length:20},(_,i)=>({id:i+1,name:`استایل ${i+1}`,category:i%3===0?'hair':i%3===1?'beard':'combo',price:50+Math.round(i*450/19),description:'مدل حرفه‌ای AMIRY — قابل انتخاب برای نوبت',image:''}));
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{styles:defaultStyles,bookings:[],likes:{},comments:{},bg:''};
+const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
+const tr={fa:{home:'خانه',styles:'استایل‌ها',booking:'نوبت‌گیری',about:'درباره AMIRY',admin:'⚙️ پنل مدیریت',menu:'منو',heroTitle:'استایل خودت را انتخاب کن.',heroText:'مدل مو، ریش و خدمات آرایش مردانه را ببین و برای زمان مناسب نوبت بگیر.',viewStyles:'مشاهده استایل‌ها',bookNow:'نوبت بگیر',styleCount:'استایل',bookingCount:'نوبت ثبت‌شده',priceRange:'افغانی · بازه قیمت',chooseStyle:'استایل مورد علاقه‌ات را پیدا کن',search:'جستجوی استایل...',bookingTitle:'نوبت خود را ثبت کن',firstName:'اسم',lastName:'تخلص',phone:'شماره تماس',date:'تاریخ',time:'ساعت',style:'استایل',price:'قیمت',submitBooking:'ثبت نوبت',bookingNote:'پس از ثبت، اطلاعات نوبت در پنل مالک ذخیره می‌شود. برای ارسال SMS واقعی به سرویس پیامک/سرور نیاز است.',aboutTitle:'آرایش مردانه با تمرکز روی استایل',aboutText:'این سایت برای معرفی استایل‌ها، مشاهده جزئیات و ثبت نوبت طراحی شده است. هیچ عدد یا آمار ساختگی درباره نوبت‌ها نمایش داده نمی‌شود.',language:'زبان',adminPanel:'پنل مدیریت',ownerOnly:'این بخش فقط برای مالک است.',login:'ورود'},
+ps:{home:'کور',styles:'سټایلونه',booking:'نوبت',about:'د AMIRY په اړه',admin:'⚙️ مدیریت',menu:'مینو',heroTitle:'خپل سټایل وټاکئ.',heroText:'د وېښتانو او ږیرې سټایلونه وګورئ او د مناسب وخت لپاره نوبت واخلئ.',viewStyles:'سټایلونه وګورئ',bookNow:'نوبت واخلئ',styleCount:'سټایلونه',bookingCount:'ثبت شوي نوبتونه',priceRange:'افغانۍ · د قیمت حد',chooseStyle:'خپل خوښ سټایل پیدا کړئ',search:'سټایل ولټوئ...',bookingTitle:'خپل نوبت ثبت کړئ',firstName:'نوم',lastName:'تخلص',phone:'د اړیکې شمېره',date:'نېټه',time:'وخت',style:'سټایل',price:'قیمت',submitBooking:'نوبت ثبتول',bookingNote:'نوبت د مالک په پینل کې ساتل کېږي.',aboutTitle:'د نارینه وو مسلکي آرایش',aboutText:'دا سایټ د سټایلونو، قیمتونو او نوبت لپاره دی. جعلي احصائیه نه ښودل کېږي.',language:'ژبه',adminPanel:'مدیریت',ownerOnly:'یوازې د مالک لپاره.',login:'ننوتل'},
+en:{home:'Home',styles:'Styles',booking:'Booking',about:'About AMIRY',admin:'⚙️ Admin',menu:'Menu',heroTitle:'Choose your style.',heroText:'Explore men’s hair and beard styles and book a suitable time.',viewStyles:'View styles',bookNow:'Book now',styleCount:'Styles',bookingCount:'Bookings',priceRange:'AFN · price range',chooseStyle:'Find your style',search:'Search styles...',bookingTitle:'Book an appointment',firstName:'First name',lastName:'Last name',phone:'Phone',date:'Date',time:'Time',style:'Style',price:'Price',submitBooking:'Submit booking',bookingNote:'The booking is stored in the owner dashboard. Real SMS requires a server/SMS provider.',aboutTitle:'Men’s grooming focused on style',aboutText:'This site shows real stored bookings only; no fake booking statistics are displayed.',language:'Language',adminPanel:'Admin panel',ownerOnly:'Owner only.',login:'Login'}};
+let lang=localStorage.getItem('amiry_lang')||'fa';
 
-const defaults=()=>({appearance:{heroTitle:'استایل خودت را انتخاب کن.',heroSub:'مدل مو، ریش و استایل دلخواهت را ببین و برای نوبت انتخاب کن.',brand:'AMIRY',accent:'#ffffff',heroImage:'',logoImage:''},styles:Array.from({length:100},(_,i)=>({id:i+1,name:`استایل ${i+1}`,price:[500,800,1100,1400,1700,2000,2300,2600][i%8],category:['classic','fade','beard','modern'][i%4],description:'استایل مو — AMIRY',image:'',active:true,likes:0,comments:[]})),bookings:[]});
-let db=load(); let selectedStyleId=null;
+function applyLang(){
+ document.documentElement.lang=lang; document.documentElement.dir=lang==='en'?'ltr':'rtl';
+ $$('[data-i18n]').forEach(e=>e.textContent=tr[lang][e.dataset.i18n]||e.textContent);
+ $$('[data-i18n-placeholder]').forEach(e=>e.placeholder=tr[lang][e.dataset.i18nPlaceholder]||e.placeholder);
+ $('#langBtn').textContent=lang==='fa'?'FA':lang==='ps'?'PS':'EN';
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function renderFilters(){
+ const labels={all:{fa:'همه',ps:'ټول',en:'All'},hair:{fa:'مو',ps:'وېښتان',en:'Hair'},beard:{fa:'ریش',ps:'ږیره',en:'Beard'},combo:{fa:'مو + ریش',ps:'وېښتان + ږیره',en:'Hair + Beard'}};
+ $('#filters').innerHTML=Object.keys(labels).map((k,i)=>`<button class="${i?'':'active'}" data-filter="${k}">${labels[k][lang]}</button>`).join('');
+ $$('#filters button').forEach(b=>b.onclick=()=>{$$('#filters button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderStyles(b.dataset.filter)});
+}
+let currentFilter='all';
+function renderStyles(filter=currentFilter){
+ currentFilter=filter; const q=$('#search').value.trim().toLowerCase();
+ const arr=db.styles.filter(s=>(filter==='all'||s.category===filter)&&(!q||s.name.toLowerCase().includes(q)));
+ $('#styleCount').textContent=db.styles.length;
+ $('#bookingCount').textContent=db.bookings.length;
+ $('#styleGrid').innerHTML=arr.map(s=>card(s)).join('')||'<p class="muted">موردی پیدا نشد.</p>';
+ $$('#styleGrid [data-view]').forEach(b=>b.onclick=()=>openDetail(+b.dataset.view));
+ $$('#styleGrid [data-like]').forEach(b=>b.onclick=()=>like(+b.dataset.like));
+ $$('#styleGrid [data-book]').forEach(b=>b.onclick=()=>{location.hash='booking';$('#bookingStyle').value=b.dataset.book;updateBookingPrice()});
+}
+function imgStyle(s){return s.image?`style="background-image:url('${s.image.replaceAll("'","%27")}')"`:''}
+function card(s){
+ const likes=db.likes[s.id]||0;
+ return `<article class="style-card"><div class="style-image" ${imgStyle(s)}><span class="tag">${s.category==='hair'?'hair':s.category==='beard'?'beard':'combo'}</span>${s.image?'':'AMIRY · STYLE '+s.id}</div><div class="style-body"><h3>${esc(s.name)}</h3><div class="price">${s.price} <small>AFN</small></div><p class="muted">${esc(s.description)}</p><div class="likes">♥ ${likes} · ${db.comments[s.id]?.length||0} comments</div><div class="card-actions"><button data-like="${s.id}">♥</button><button class="book" data-view="${s.id}">مشاهده</button></div></div></article>`
+}
+function esc(x){return String(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function openDetail(id){
+ const s=db.styles.find(x=>x.id===id); if(!s)return;
+ const comments=db.comments[id]||[];
+ $('#styleDetail').innerHTML=`<img class="detail-image" ${s.image?`src="${esc(s.image)}"`:''} alt="${esc(s.name)}">${s.image?'': '<div class="muted">برای این استایل هنوز عکس ثبت نشده است.</div>'}<h2>${esc(s.name)}</h2><p>${esc(s.description)}</p><div class="detail-price">${s.price} AFN</div><button class="btn primary full" id="detailBook">نوبت این استایل</button><div class="comments"><h3>♥ ${db.likes[id]||0} · نظرات</h3><div>${comments.map(c=>`<p><b>${esc(c.name)}</b>: ${esc(c.text)}</p>`).join('')||'<span class="muted">هنوز نظری ثبت نشده.</span>'}</div><div class="comment-row"><input id="commentName" placeholder="نام"><input id="commentText" placeholder="نظر"><button class="btn primary" id="commentBtn">ارسال</button></div></div>`;
+ $('#styleDialog').showModal();
+ $('#detailBook').onclick=()=>{location.hash='booking';$('#bookingStyle').value=id;updateBookingPrice();$('#styleDialog').close()};
+ $('#commentBtn').onclick=()=>{const n=$('#commentName').value.trim(),t=$('#commentText').value.trim();if(!n||!t)return toast('نام و نظر را وارد کنید');(db.comments[id]??=[]).push({name:n,text:t,date:new Date().toISOString()});save();openDetail(id);renderStyles(currentFilter)};
+}
+function like(id){db.likes[id]=(db.likes[id]||0)+1;save();renderStyles(currentFilter)}
+function fillBooking(){
+ $('#bookingStyle').innerHTML=db.styles.map(s=>`<option value="${s.id}">${esc(s.name)} — ${s.price} AFN</option>`).join('');
+ updateBookingPrice();
+}
+function updateBookingPrice(){const s=db.styles.find(x=>x.id===+$('#bookingStyle').value);$('#bookingPrice').textContent=s?s.price:'—'}
+$('#bookingStyle').onchange=updateBookingPrice;
+$('#bookingForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);const s=db.styles.find(x=>x.id===+f.get('styleId'));const b={id:Date.now(),firstName:f.get('firstName'),lastName:f.get('lastName'),phone:f.get('phone'),date:f.get('date'),time:f.get('time'),styleId:s.id,styleName:s.name,price:s.price,createdAt:new Date().toISOString(),status:'new'};db.bookings.push(b);save();e.target.reset();fillBooking();toast('نوبت ثبت شد.');renderStyles();renderAppointments();};
+function renderAppointments(){
+ $('#appointmentList').innerHTML=db.bookings.length?db.bookings.slice().reverse().map(b=>`<div class="admin-item"><b>${esc(b.firstName)} ${esc(b.lastName)}</b><div>${b.date} · ${b.time} · ${esc(b.styleName)} · ${b.price} AFN</div><div>☎ ${esc(b.phone)}</div><div class="actions"><button class="btn ghost" data-sms="${b.id}">پیامک</button><button class="btn ghost" data-delbooking="${b.id}">حذف</button></div></div>`).join(''):'<p class="muted">هنوز هیچ نوبتی ثبت نشده است.</p>';
+ $$('[data-delbooking]').forEach(x=>x.onclick=()=>{db.bookings=db.bookings.filter(b=>b.id!==+x.dataset.delbooking);save();renderAppointments();renderStyles()});
+ $$('[data-sms]').forEach(x=>x.onclick=()=>{const b=db.bookings.find(z=>z.id===+x.dataset.sms);const msg=encodeURIComponent(`AMIRY: ${b.firstName} ${b.lastName} در تاریخ ${b.date} ساعت ${b.time} برای ${b.styleName} به قیمت ${b.price} افغانی نوبت گرفته است.`);location.href=`sms:+93773269043?body=${msg}`});
+}
+function renderAdminStyles(){
+ $('#adminStyleList').innerHTML=db.styles.map(s=>`<div class="admin-item"><b>${esc(s.name)}</b> — ${s.price} AFN<div class="actions"><button class="btn ghost" data-edit="${s.id}">✏️ ویرایش</button><button class="btn ghost" data-del="${s.id}">🗑️ حذف</button></div></div>`).join('');
+ $$('[data-edit]').forEach(x=>x.onclick=()=>{const s=db.styles.find(z=>z.id===+x.dataset.edit);const f=$('#styleForm');Object.keys(s).forEach(k=>{if(f.elements[k])f.elements[k].value=s[k]??''})});
+ $$('[data-del]').forEach(x=>x.onclick=()=>{if(confirm('حذف شود؟')){db.styles=db.styles.filter(s=>s.id!==+x.dataset.del);save();renderStyles();fillBooking();renderAdminStyles()}});
+}
+$('#styleForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);let id=+f.get('id');const obj={id:id||Date.now(),name:f.get('name'),category:f.get('category'),price:Math.max(50,Math.min(500,+f.get('price'))),description:f.get('description'),image:f.get('image')};if(id){db.styles=db.styles.map(s=>s.id===id?obj:s)}else db.styles.push(obj);save();e.target.reset();renderStyles();fillBooking();renderAdminStyles();toast('ذخیره شد')};
+$('#resetStyleForm').onclick=()=>$('#styleForm').reset();
 
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));return x||defaults()}catch{return defaults()}}
-function save(){localStorage.setItem(KEY,JSON.stringify(db))}
-function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2400)}
-function money(n){return new Intl.NumberFormat('fa-AF').format(n)+' افغانی'}
-function imgData(file){return new Promise((res,rej)=>{if(!file)return res('');const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}
-function isOwner(){return sessionStorage.getItem(ADMIN_SESSION)==='1'}
+function openMenu(){ $('#sideMenu').classList.add('open');$('#overlay').classList.add('open');$('#sideMenu').setAttribute('aria-hidden','false')}
+function closeMenu(){ $('#sideMenu').classList.remove('open');$('#overlay').classList.remove('open');$('#sideMenu').setAttribute('aria-hidden','true')}
+$('#menuBtn').onclick=openMenu;$('#closeMenu').onclick=closeMenu;$('#overlay').onclick=closeMenu;
+$('#langBtn').onclick=()=>$('#langDialog').showModal();
+$$('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;localStorage.setItem('amiry_lang',lang);applyLang();renderFilters();renderStyles();fillBooking();$('#langDialog').close();});
+$$('[data-close]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.close).close());
+$('#search').oninput=()=>renderStyles(currentFilter);
 
-function render(){
- const q=document.getElementById('search').value.trim().toLowerCase(), cat=document.getElementById('category').value, sort=document.getElementById('sort').value;
- let arr=db.styles.filter(s=>s.active&&((s.name+' '+s.id).toLowerCase().includes(q))&&(cat==='all'||s.category===cat));
- if(sort==='low')arr.sort((a,b)=>a.price-b.price); if(sort==='high')arr.sort((a,b)=>b.price-a.price);
- document.getElementById('styleCount').textContent=db.styles.filter(s=>s.active).length;
- document.getElementById('stylesGrid').innerHTML=arr.map(s=>`
- <article class="style-card"><div class="style-image">${s.image?`<img src="${s.image}" alt="${esc(s.name)}">`:`<div class="placeholder">AMIRY<small>STYLE ${s.id}</small></div>`}<span class="style-badge">${s.category}</span></div>
- <div class="style-body"><h3>${esc(s.name)}</h3><div class="price">${money(s.price)}</div><p class="desc">${esc(s.description||'')}</p>
- <div class="style-actions"><button onclick="openStyle(${s.id})">مشاهده</button><button class="like ${s.likes&&s.likes>0?'liked':''}" onclick="likeStyle(${s.id})">♥ ${s.likes||0}</button></div></div></article>`).join('');
- document.getElementById('emptyState').classList.toggle('hidden',arr.length>0);
- renderBookingStyles(); applyAppearance();
-}
-function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function applyAppearance(){
- document.getElementById('heroTitle').textContent=db.appearance.heroTitle;
- document.getElementById('heroSub').textContent=db.appearance.heroSub;
- document.querySelectorAll('.brand').forEach(e=>e.innerHTML=esc(db.appearance.brand)+'<span>®</span>');
- const hero=document.getElementById('hero'); hero.style.backgroundImage=db.appearance.heroImage?`url("${db.appearance.heroImage}")`:'none';
- document.documentElement.style.setProperty('--accent',db.appearance.accent||'#fff');
-}
-function renderBookingStyles(){
- const sel=document.getElementById('bookingStyle'); const old=sel.value;
- sel.innerHTML=db.styles.filter(s=>s.active).map(s=>`<option value="${s.id}">${esc(s.name)} — ${money(s.price)}</option>`).join('');
- if(old)sel.value=old; updateBookingSummary();
-}
-function openStyle(id){
- selectedStyleId=id; const s=db.styles.find(x=>x.id===id); if(!s)return;
- document.getElementById('styleDialogBody').innerHTML=`<div class="style-image">${s.image?`<img src="${s.image}" alt="${esc(s.name)}">`:`<div class="placeholder">AMIRY</div>`}</div><p class="eyebrow">STYLE ${s.id}</p><h2>${esc(s.name)}</h2><h3>${money(s.price)}</h3><p>${esc(s.description||'')}</p><button class="primary-btn" onclick="openBooking(${s.id})">نوبت برای این استایل</button><div class="comments"><b>♥ ${s.likes||0} لایک</b><div class="comment-list">${(s.comments||[]).map(c=>`<div class="comment"><strong>${esc(c.name)}</strong>${esc(c.text)}</div>`).join('')||'<span class="muted">هنوز کامنتی ثبت نشده.</span>'}</div><form class="comment-form" onsubmit="commentStyle(event,${s.id})"><input name="name" placeholder="نام" required><input name="text" placeholder="نظر شما..." required><button class="primary-btn">ارسال</button></form></div>`;
- document.getElementById('styleDialog').showModal();
-}
-function likeStyle(id){const s=db.styles.find(x=>x.id===id);s.likes=(s.likes||0)+1;save();render();toast('لایک ثبت شد ❤️')}
-function commentStyle(e,id){e.preventDefault();const s=db.styles.find(x=>x.id===id);const f=new FormData(e.target);s.comments=s.comments||[];s.comments.push({name:f.get('name'),text:f.get('text')});save();openStyle(id);toast('کامنت ثبت شد')}
-function openBooking(id){document.getElementById('styleDialog').close();document.getElementById('bookingStyle').value=id;updateBookingSummary();document.getElementById('bookingDialog').showModal()}
-function updateBookingSummary(){const id=Number(document.getElementById('bookingStyle').value);const s=db.styles.find(x=>x.id===id);document.getElementById('bookingSummary').textContent=s?`${s.name} — ${money(s.price)}`:''}
-function openAdmin(){if(isOwner()){renderAdmin();document.getElementById('adminDialog').showModal()}else document.getElementById('loginDialog').showModal()}
-function renderAdmin(){
- document.getElementById('mStyles').textContent=db.styles.length;document.getElementById('mBookings').textContent=db.bookings.length;
- document.getElementById('mLikes').textContent=db.styles.reduce((a,s)=>a+(s.likes||0),0);document.getElementById('mComments').textContent=db.styles.reduce((a,s)=>a+(s.comments?.length||0),0);
- const q=document.getElementById('adminSearch').value.toLowerCase();
- document.getElementById('adminStylesList').innerHTML=db.styles.filter(s=>(s.name+' '+s.id).toLowerCase().includes(q)).map(s=>`<div class="admin-row"><div>${s.image?`<img src="${s.image}">`:'📷'}</div><div><b>${esc(s.name)}</b><br>${money(s.price)} · ${s.active?'فعال':'غیرفعال'} · ♥${s.likes||0} · 💬${s.comments?.length||0}</div><div class="admin-row-actions"><button onclick="editStyle(${s.id})">✏️ ویرایش</button><button onclick="changeStyleImage(${s.id})">🔄 عکس</button><button class="danger" onclick="removeStyle(${s.id})">🗑️</button></div></div>`).join('');
- document.getElementById('bookingsList').innerHTML=db.bookings.length?db.bookings.slice().reverse().map((b,i)=>`<div class="booking-item"><b>${esc(b.firstName)} ${esc(b.lastName)}</b><div>${esc(b.date)} · ${esc(b.time)} · ${esc(b.styleName)} · ${money(b.price)}</div><div class="muted">${esc(b.note||'')}</div><div class="booking-actions"><a href="sms:${PHONE2}?body=${encodeURIComponent(smsText(b))}">SMS به 2</a><a href="sms:${PHONE1}?body=${encodeURIComponent(smsText(b))}">SMS به 1</a><button onclick="deleteBooking(${db.bookings.length-1-i})">حذف</button></div></div>`).join(''):'<p class="muted">هنوز نوبتی ثبت نشده.</p>';
- const a=document.getElementById('appearanceForm');a.heroTitle.value=db.appearance.heroTitle;a.heroSub.value=db.appearance.heroSub;a.brand.value=db.appearance.brand;a.accent.value=db.appearance.accent||'#ffffff';document.getElementById('bgPreview').style.backgroundImage=db.appearance.heroImage?`url("${db.appearance.heroImage}")`:'none';
-}
-function smsText(b){return `AMIRY: ${b.firstName} ${b.lastName} در تاریخ ${b.date} ساعت ${b.time} برای آرایش نوبت گرفته است. استایل: ${b.styleName}، قیمت: ${b.price} افغانی.`}
-function editStyle(id){
- selectedStyleId=id;const s=db.styles.find(x=>x.id===id),f=document.getElementById('editForm');f.id.value=s.id;f.name.value=s.name;f.price.value=s.price;f.category.value=s.category;f.active.value=String(s.active);f.description.value=s.description||'';f.image.value='';document.getElementById('editDialog').showModal()
-}
-async function saveStyle(e){e.preventDefault();const f=new FormData(e.target),s=db.styles.find(x=>x.id===Number(f.get('id')));s.name=f.get('name');s.price=Number(f.get('price'));s.category=f.get('category');s.active=f.get('active')==='true';s.description=f.get('description');const im=await imgData(f.get('image'));if(im)s.image=im;save();document.getElementById('editDialog').close();render();renderAdmin();toast('استایل ذخیره شد')}
-async function changeStyleImage(id){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=async()=>{const s=db.styles.find(x=>x.id===id);s.image=await imgData(inp.files[0]);save();render();renderAdmin();toast('عکس تغییر کرد')};inp.click()}
-function removeStyle(id){if(!confirm('این استایل حذف شود؟'))return;db.styles=db.styles.filter(s=>s.id!==id);save();render();renderAdmin();toast('استایل حذف شد')}
-function deleteBooking(i){db.bookings.splice(i,1);save();renderAdmin()}
-function downloadSMS(){if(!db.bookings.length)return toast('نوبتی وجود ندارد');const body=db.bookings.map(smsText).join('\\n');navigator.clipboard?.writeText(body);toast('متن پیام‌ها کپی شد')}
-function setup(){
- document.getElementById('year').textContent=new Date().getFullYear();render();
- ['search','category','sort'].forEach(id=>document.getElementById(id).addEventListener('input',render));
- document.getElementById('bookingStyle').addEventListener('change',updateBookingSummary);
- ['bookTop','heroBook','stylesBook'].forEach(id=>document.getElementById(id).onclick=()=>document.getElementById('bookingDialog').showModal());
- document.getElementById('adminTop').onclick=openAdmin;
- document.getElementById('loginForm').onsubmit=e=>{e.preventDefault();if(new FormData(e.target).get('pin')===ADMIN_PIN){sessionStorage.setItem(ADMIN_SESSION,'1');document.getElementById('loginDialog').close();document.getElementById('adminTop').classList.remove('hidden');openAdmin()}else toast('رمز مدیریت نادرست است')};
- if(isOwner())document.getElementById('adminTop').classList.remove('hidden');
- document.getElementById('logout').onclick=()=>{sessionStorage.removeItem(ADMIN_SESSION);document.getElementById('adminDialog').close();document.getElementById('adminTop').classList.add('hidden')};
- document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.close).close());
- document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.admin-panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('tab-'+b.dataset.tab).classList.add('active')});
- document.getElementById('editForm').onsubmit=saveStyle;document.getElementById('deleteStyle').onclick=()=>{removeStyle(selectedStyleId);document.getElementById('editDialog').close()};
- document.getElementById('adminSearch').oninput=renderAdmin;document.getElementById('addStyle').onclick=()=>{const n=db.styles.length?Math.max(...db.styles.map(s=>s.id))+1:1;db.styles.push({id:n,name:`استایل ${n}`,price:500,category:'classic',description:'استایل مو — AMIRY',image:'',active:true,likes:0,comments:[]});save();render();renderAdmin();editStyle(n)};
- document.getElementById('appearanceForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);db.appearance.heroTitle=f.get('heroTitle');db.appearance.heroSub=f.get('heroSub');db.appearance.brand=f.get('brand');db.appearance.accent=f.get('accent');const im=await imgData(f.get('heroImage'));if(im)db.appearance.heroImage=im;const logo=await imgData(f.get('logoImage'));if(logo)db.appearance.logoImage=logo;save();render();renderAdmin();toast('ظاهر سایت ذخیره شد')};
- document.getElementById('clearBookings').onclick=()=>{if(confirm('همه درخواست‌ها حذف شوند؟')){db.bookings=[];save();renderAdmin()}};
- document.getElementById('notifyAll').onclick=downloadSMS;
- document.getElementById('bookingForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),s=db.styles.find(x=>x.id===Number(f.get('style')));const b={firstName:f.get('firstName'),lastName:f.get('lastName'),date:f.get('date'),time:f.get('time'),styleId:s.id,styleName:s.name,price:s.price,note:f.get('note'),createdAt:new Date().toISOString()};db.bookings.push(b);save();e.target.reset();document.getElementById('bookingDialog').close();toast('درخواست نوبت ثبت شد.');if(isOwner())renderAdmin()};
-}
-setup();
+$('#adminOpen').onclick=()=>{closeMenu();$('#adminLogin').showModal()};
+$('#adminLoginBtn').onclick=()=>{const pin=$('#adminPin').value;if(pin==='2468'){sessionStorage.setItem('amiry_admin','1');$('#adminLogin').close();$('#adminDialog').showModal();renderAppointments();renderAdminStyles()}else toast('PIN نادرست است')};
+$$('.admin-tabs button').forEach(b=>b.onclick=()=>{$$('.admin-tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.admin-tab').forEach(x=>x.classList.add('hidden'));$('#'+b.dataset.tab).classList.remove('hidden')});
+$('#saveBg').onclick=()=>{const u=$('#bgUrl').value.trim();if(u){db.bg=u;save();applyBg();toast('پس‌زمینه اعمال شد')}};
+$('#bgFile').onchange=e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{db.bg=r.result;save();applyBg();toast('پس‌زمینه روی این دستگاه اعمال شد')};r.readAsDataURL(file)};
+function applyBg(){document.documentElement.style.setProperty('--site-bg',db.bg?`url("${db.bg}")`:'none');document.documentElement.style.setProperty('--hero-bg',db.bg?`url("${db.bg}")`:'linear-gradient(135deg,#111,#252525)')}
+applyLang();applyBg();renderFilters();renderStyles();fillBooking();renderAppointments();
